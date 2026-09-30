@@ -12,7 +12,7 @@ OpenSSL dışında Python paketi gerekmez.
 Terminalde:
 
 ```bash
-cd ~/PROJE/http-temelleri
+cd "$(git rev-parse --show-toplevel)"
 python3 server.py
 ```
 
@@ -24,7 +24,7 @@ Tarayıcıda <http://localhost:8000> adresini aç. Durdurmak için terminalde
 HTTPS sunucusunu çalıştır:
 
 ```bash
-cd ~/PROJE/http-temelleri
+cd "$(git rev-parse --show-toplevel)"
 python3 server.py --https
 ```
 
@@ -184,3 +184,7 @@ bilgilerini, CORS başlıkları tarayıcı erişim politikasını anlatır.
 
 Veriler ve oturumlar bellekte saklanır; sunucu yeniden başlayınca başlangıç
 kitaplarına döner ve oturumlar kapanır. Sunucu sadece yerel öğrenme içindir.
+
+## Proje dizini
+
+Depoyu istediğiniz klasöre klonlayıp o dizine girin. `git rev-parse --show-toplevel` kullanılan komutlar klonun içinden çalıştırılır; kullanıcı adı veya sabit bir ana dizin gerekmez.
