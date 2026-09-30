@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HTTP Temelleri — İstek Laboratuvarı</title>
+  <style>
+    :root{--ink:#1b3038;--muted:#65777b;--paper:#f5f7f4;--card:#fff;--line:#e0e7e2;--green:#17765d;--pale:#eaf4ef;--code:#172d36}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif}
+    header{background:#183e43;color:#fff;padding:46px max(24px,calc((100% - 980px)/2)) 42px}.eyebrow{font-size:.76rem;text-transform:uppercase;letter-spacing:.13em;color:#a6d8c4;font-weight:750}h1{font-size:clamp(2.3rem,6vw,3.6rem);line-height:1.08;margin:8px 0 12px;letter-spacing:-.04em}header p{max-width:680px;color:#d7e8e1;margin:0;font-size:1.08rem}.wrap{max-width:980px;margin:30px auto;padding:0 20px}.stack{display:grid;gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:23px 25px;box-shadow:0 5px 20px #183e4308}.card h2{font-size:1.28rem;line-height:1.3;margin:0 0 10px}.card h3{font-size:1rem;margin:19px 0 5px}.card p{margin:7px 0}.muted{color:var(--muted)}.step{display:inline-grid;place-items:center;width:28px;height:28px;margin-right:7px;border-radius:50%;background:var(--pale);color:var(--green);font-size:.88rem}.exchange{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;margin-top:16px}.exchange div{background:#f4f8f5;border:1px solid var(--line);padding:14px;border-radius:10px}.exchange b{display:block;color:var(--green)}.arrow{font-size:1.5rem;color:#8ca39a}.terms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.term{padding:13px 15px;border:1px solid var(--line);border-radius:10px}.term strong{display:block;color:var(--green);margin-bottom:2px}.labintro{margin-bottom:16px}.controls{display:grid;grid-template-columns:130px minmax(0,1fr) auto;gap:9px}select,input,textarea,button{font:inherit;border-radius:8px;border:1px solid #cbd8d2;padding:10px 12px;color:var(--ink);background:white}button{background:var(--green);color:white;border:0;font-weight:700;cursor:pointer;padding-inline:19px}button:hover{background:#105f4b}textarea{width:100%;min-height:96px;font: .9rem/1.5 ui-monospace,SFMono-Regular,monospace}.fieldlabel{display:block;font-weight:650;margin:15px 0 5px}.hint{font-size:.9rem;color:var(--muted)}.result{background:var(--code);color:#e4f2ec;border-radius:10px;padding:16px;min-height:115px;overflow:auto;margin-top:13px}.result pre{white-space:pre-wrap;word-break:break-word;margin:5px 0 12px;font-size:.87rem}.status{font-weight:750;color:#9be0bd}.result-label{font-size:.82rem;color:#aac4bd;text-transform:uppercase;letter-spacing:.06em}.tablewrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.94rem}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}th{color:#52666b;font-size:.85rem}code{font-size:.9em;background:#edf2ef;padding:2px 5px;border-radius:4px}.callout{background:var(--pale);border-radius:9px;padding:12px 14px;margin-top:14px}.questions{padding-left:23px}.questions li{padding:3px 0}footer{max-width:980px;margin:0 auto;padding:0 20px 34px;color:var(--muted);font-size:.9rem}
+    .authgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.authgrid input{width:100%}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.secondary{background:#365660}.authresult{padding:12px 14px;background:#f3f7f4;border-radius:9px;margin-top:12px;white-space:pre-wrap;word-break:break-word}.topic{padding:14px 0;border-top:1px solid var(--line)}.topic:first-of-type{border-top:0}.topic h3{margin:0 0 5px}
+    @media(max-width:680px){header{padding:34px 22px}.wrap{margin:20px auto}.card{padding:19px}.exchange{grid-template-columns:1fr}.arrow{transform:rotate(90deg);text-align:center;line-height:1}.terms{grid-template-columns:1fr}.controls{grid-template-columns:1fr}.authgrid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header><div class="eyebrow">Başlangıçtan uygulamaya · adım adım öğren</div><h1>HTTP Temelleri</h1><p>İstekleri gönderip yanıtları incele; yöntemlerden girişe, HTTPS’e, CORS’a ve önbelleğe kadar HTTP’yi uygulayarak öğren.</p></header>
+  <main class="wrap stack">
+    <section class="card"><h2><span class="step">1</span>HTTP nasıl çalışır?</h2><p>HTTP, istemci ile sunucunun bilgi alışverişi yapma kurallarını tanımlar. Bu sayfada tarayıcı <b>istemci</b>, Python programı <b>sunucu</b> görevindedir.</p><div class="exchange"><div><b>İstek · Request</b>İstemci ne istediğini söyler.<br><code>GET /api/books</code></div><div class="arrow">→</div><div><b>Yanıt · Response</b>Sunucu sonucu ve veriyi döndürür.<br><code>200 OK</code> + kitap listesi</div></div></section>
+    <section class="card"><h2><span class="step">2</span>URL nasıl okunur?</h2><p>URL, hangi sunucuya ve hangi kaynağa gidileceğini belirtir. Soru işaretinden sonraki bölüm filtre gibi ek bilgi taşıyabilir.</p><div class="callout"><code>http://localhost:8000/api/books?q=küçük</code><br><b>http</b> = protokol · <b>localhost:8000</b> = bu bilgisayar ve port · <b>/api/books</b> = yol (path) · <b>?q=küçük</b> = sorgu parametresi (query)</div></section>
+    <section class="card"><h2><span class="step">3</span>Temel terimler</h2><div class="terms">
+      <div class="term"><strong>Yöntem · Method</strong>İsteğin amacını belirtir: oku, oluştur, güncelle veya sil.</div>
+      <div class="term"><strong>Endpoint</strong>API’de isteğin gittiği adres. Örnek: <code>/api/books/1</code>.</div>
+      <div class="term"><strong>Başlık · Header</strong>İstek/yanıtla ilgili ek bilgi. <code>Content-Type</code> veri biçimini belirtir.</div>
+      <div class="term"><strong>Gövde · Body</strong>İstekle taşınan veri. Yeni kitap eklerken JSON gönderilir.</div>
+      <div class="term"><strong>JSON</strong>Veriyi düzenli biçimde yazma yöntemi. Örnek: <code>{"title":"Yeni Kitap"}</code>.</div>
+      <div class="term"><strong>Sorgu · Query</strong>URL’ye eklenen arama/filtre bilgisi. Örnek: <code>?q=küçük</code>.</div>
+    </div></section>
+    <section class="card"><h2><span class="step">4</span>İstek gönder ve yanıtı incele</h2><p class="muted labintro">Yöntemi ve adresi seç. POST, PUT veya PATCH için JSON gövdesini düzenleyebilirsin.</p>
+      <div class="controls"><select id="method" aria-label="HTTP yöntemi"><option>GET</option><option>POST</option><option>PUT</option><option>PATCH</option><option>DELETE</option></select><input id="url" value="/api/books" aria-label="İstek adresi"><button id="send">İsteği gönder</button></div>
+      <p class="hint">Örnek adresler: <code>/api/books?q=küçük</code> · <code>/api/books?page=1&amp;limit=1</code> · <code>/api/books?sort=title&amp;order=desc</code> · <code>/api/books/1</code></p>
+      <label class="fieldlabel" for="customHeader">Özel istek başlığı <span class="muted">(örnek: X-Student: Ada)</span></label><input id="customHeader" placeholder="X-Student: Ada"><p class="hint">Başlığın etkisini görmek için <code>GET /api/whoami</code> adresine <code>X-Student: Ada</code> ile istek gönder. Sunucu gönderdiğin adı yanıtta gösterecek.</p>
+      <label class="fieldlabel" for="body">İstek gövdesi <span class="muted">(JSON; POST, PUT ve PATCH’te kullanılır)</span></label><textarea id="body" spellcheck="false">{
+  "title": "Yeni Kitap",
+  "author": "Öğrenci"
+}</textarea>
+      <div id="result" class="result" aria-live="polite">Yanıt burada görünecek. Önce README’deki adımlarla sunucuyu başlat.</div>
+    </section>
+    <section class="card"><h2><span class="step">5</span>İstek geçmişi</h2><p class="muted">Bu oturumda gönderdiğin son istekler burada görünür. Sayfa kapanınca geçmiş temizlenir.</p><ol id="history" class="questions"><li>Henüz istek gönderilmedi.</li></ol></section>
+    <section class="card"><h2><span class="step">6</span>Yöntemler ve durum kodları</h2><div class="tablewrap"><table><thead><tr><th>Yöntem / kod</th><th>Anlamı</th><th>Bu projede</th></tr></thead><tbody>
+      <tr><td><b>GET</b></td><td>Veriyi oku; sunucudaki veriyi değiştirmemelidir.</td><td>Kitapları getir.</td></tr><tr><td><b>POST</b></td><td>Yeni kaynak oluştur. Aynı isteği tekrarlamak yeni kayıt oluşturabilir.</td><td>Kitap ekle; başarılıysa <b>201</b>.</td></tr><tr><td><b>PUT</b></td><td>Kaynağı tamamen güncelle.</td><td>Başlık ve yazarı birlikte gönder.</td></tr><tr><td><b>PATCH</b></td><td>Kaynağın yalnızca gönderilen alanlarını güncelle.</td><td><code>{"title":"Yeni ad"}</code> ile sadece başlığı değiştir.</td></tr><tr><td><b>DELETE</b></td><td>Kaynağı sil.</td><td>Bir kitabı kaldır.</td></tr>
+      <tr><td><b>200</b></td><td>İstek başarılı.</td><td>Okuma veya güncelleme.</td></tr><tr><td><b>201</b></td><td>Yeni kaynak oluşturuldu.</td><td>POST ile kitap eklendi.</td></tr><tr><td><b>400</b></td><td>İstek/gönderilen veri hatalı.</td><td>Gerekli bilgi eksik veya JSON bozuk.</td></tr><tr><td><b>404</b></td><td>Adres veya kaynak bulunamadı.</td><td><code>/api/books/999</code>.</td></tr></tbody></table></div><div class="callout"><b>İdempotent işlem:</b> Aynı isteği tekrar etmek sonucu değiştirmiyorsa işlem idempotent’tir. GET, PUT ve DELETE’in standart kullanım amacı budur. POST genellikle idempotent değildir; aynı POST iki kayıt oluşturabilir.</div><div class="callout"><b>Yanıt başlıkları:</b> <code>Content-Type</code> yanıt biçimini, <code>Cache-Control</code> önbellek davranışını, <code>X-Request-ID</code> bu isteğin benzersiz kimliğini gösterir.</div><p class="hint">Tarayıcı güvenlik nedeniyle bazı otomatik başlıkları JavaScript’e göstermez. İstek özeti, sayfanın gönderdiği başlıkları gösterir.</p></section>
+    <section class="card"><h2><span class="step">7</span>Giriş: çerez ve Bearer token</h2><p>Örnek kullanıcılar <code>student / http101</code> ve <code>teacher / teach101</code>. Giriş başarılı olunca sunucu hem HttpOnly oturum çerezi hem de cevap gövdesinde bir access token verir.</p><div class="authgrid"><input id="username" value="student" aria-label="Kullanıcı adı"><input id="password" type="password" value="http101" aria-label="Parola"></div><div class="actions"><button id="login">Giriş yap</button><button id="cookieProfile" class="secondary">Çerezle profili getir</button><button id="bearerProfile" class="secondary">Bearer token ile profili getir</button><button id="admin" class="secondary">Öğretmen alanını dene</button><button id="logout" class="secondary">Çıkış yap</button></div><div id="authResult" class="authresult" aria-live="polite">Henüz giriş yapılmadı. Öğretmen alanına student ile girersen 403, giriş yapmadan denersen 401 alırsın.</div><p class="hint">Token bu sayfa açıkken bellekte tutulur. HttpOnly çerez JavaScript’ten okunamaz; tarayıcı uygun isteklerde kendisi gönderir. Çerez demosu için HTTPS kullanman önerilir.</p></section>
+    <section class="card"><h2><span class="step">8</span>HTTPS, CORS ve önbellek</h2>
+      <div class="topic"><h3>HTTPS ve TLS</h3><p>Sunucuyu <code>python3 server.py --https</code> ile aç. İlk çalıştırmada OpenSSL yerel sertifika üretir. <code>https://localhost:8443</code> adresindeki tarayıcı uyarısı, sertifikanın yerel ve kendinden imzalı olmasındandır; bu sertifika internette kullanılmamalı.</p></div>
+      <div class="topic"><h3>CORS ve preflight</h3><p>CORS, tarayıcının farklı origin’e yapılan isteğin yanıtını sayfaya açıp açmayacağını denetler. İkinci terminalde <code>python3 server.py --port 8444 --https</code> çalıştır (HTTP modunda <code>--port 8001</code>). <a id="corsLink" href="/cors-client">CORS deney sayfasını aç</a>. İzinli denemede özel başlık nedeniyle tarayıcı önce OPTIONS gönderir; engelli denemeyi DevTools Network’te incele.</p></div>
+      <div class="topic"><h3>ETag ile koşullu GET</h3><p>Önce GET <code>/api/cache-demo</code> isteği gönder ve yanıttaki ETag değerini kopyala. Özel istek başlığı kutusuna <code>If-None-Match: "ETAG_DEGERI"</code> yazıp aynı isteği yeniden gönder. Kaynak değişmediyse sunucu <code>304 Not Modified</code> ve boş gövde döndürür.</p></div>
+      <div class="topic"><h3>Durum kodlarını dene</h3><p>Laboratuvarda GET adresi olarak <code>/api/status-demo?code=401</code> gir. Sonra kodu 403, 405, 409, 429 ve 500 yap. Bunlar kontrollü örnek yanıtlarıdır; gerçek giriş denetimi için <code>/api/profile</code> ve <code>/api/admin</code> kullan.</p></div>
+    </section>
+    <section class="card"><h2><span class="step">9</span>Tarayıcıda HTTP’yi incele</h2><ol class="questions"><li>Geliştirici Araçları’nı aç: Windows/Linux’ta <kbd>F12</kbd>, Mac’te <kbd>⌘⌥I</kbd>.</li><li><b>Network</b> sekmesine geç, laboratuvarda bir istek gönder ve listede isteği seç.</li><li><b>Headers</b> bölümünde Request URL, Request Method ve Status Code alanlarını bul.</li><li><b>Payload</b> gövdeyi, <b>Response</b> sunucunun yanıtını gösterir. CORS deneyinde OPTIONS isteğini ayrıca bul.</li></ol><p class="hint">CORS hatasında sunucu yanıt vermiş olsa bile tarayıcı yanıtı JavaScript’e göstermeyebilir. Network ve Console sekmeleri farkı anlamana yardım eder.</p></section>
+    <section class="card"><h2><span class="step">10</span>Kendin dene</h2><ol class="questions"><li><code>/api/health</code> adresini çağır. Bu endpoint neyi kontrol ediyor?</li><li><code>?q=küçük</code> ekleyip ara. URL’nin hangi bölümü değişti?</li><li>POST isteğini iki kere yolla. Neden iki kayıt oluşuyor?</li><li>PATCH ile yalnızca kitabın başlığını değiştir. Yazar bilgisi korunuyor mu?</li><li><code>/api/books/999</code> adresini iste. 404 ne anlatıyor?</li><li><code>?page=1&amp;limit=1</code> ve <code>?page=2&amp;limit=1</code> sonuçlarını karşılaştır.</li><li>student ile giriş yapıp /api/admin çağır; sonra teacher ile giriş yapıp tekrar dene.</li><li>ETag’ı If-None-Match ile geri gönderip 200 ve 304 yanıtlarını karşılaştır.</li><li>CORS sayfasından izinli ve engelli istekleri gönder; Network’te preflight’ı bul.</li></ol></section>
+  </main>
+  <footer>Bu eğitim sunucusu yalnızca kendi bilgisayarında çalışır. Kitaplar, oturumlar ve token’lar sunucu belleğindedir; sunucu yeniden başlayınca temizlenir. Demo parolalarını gerçek hesaplarda kullanma.</footer>
+  <script>
+    const method = document.querySelector('#method'), url = document.querySelector('#url'), body = document.querySelector('#body'), result = document.querySelector('#result'), history = [];
+    let accessToken = null;
+    const corsPort = location.protocol === 'https:' ? '8444' : '8001';
+    document.querySelector('#corsLink').href = `${location.protocol}//localhost:${corsPort}/cors-client`;
+    method.addEventListener('change', () => { body.disabled = !['POST','PUT','PATCH'].includes(method.value); body.style.opacity = body.disabled ? '.5' : '1'; });
+    document.querySelector('#send').addEventListener('click', async () => {
+      result.textContent = 'İstek gönderiliyor…';
+      const requestHeaders = {};
+      if (['POST','PUT','PATCH'].includes(method.value)) requestHeaders['Content-Type'] = 'application/json';
+      const custom = document.querySelector('#customHeader').value.trim();
+      if (custom) { const colon = custom.indexOf(':'); if (colon < 1) { result.textContent = 'Başlık biçimi hatalı. Örnek: X-Student: Ada'; return; } requestHeaders[custom.slice(0,colon).trim()] = custom.slice(colon+1).trim(); }
+      const options = {method: method.value, headers: requestHeaders};
+      if (['POST','PUT','PATCH'].includes(method.value)) options.body = body.value;
+      try {
+        const started = performance.now();
+        const response = await fetch(url.value, options);
+        const elapsed = Math.round(performance.now() - started);
+        const raw = await response.text(); let formatted = raw;
+        try { formatted = JSON.stringify(JSON.parse(raw), null, 2); } catch {}
+        const responseHeaders = [...response.headers.entries()].map(([key,value])=>`${key}: ${value}`).join('\n');
+        result.innerHTML = `<div class="status">${escapeHtml(String(response.status))} ${escapeHtml(response.statusText)} · ${elapsed} ms</div><div class="result-label">Gönderilen istek</div><pre>${escapeHtml(`${method.value} ${url.value}\n${Object.entries(requestHeaders).map(([k,v])=>`${k}: ${v}`).join('\n') || '(ek başlık yok)'}`)}</pre><div class="result-label">Yanıt başlıkları</div><pre>${escapeHtml(responseHeaders || '(başlık yok)')}</pre><div class="result-label">Yanıt gövdesi</div><pre>${escapeHtml(formatted || '(gövde yok)')}</pre>`;
+        history.unshift(`${method.value} ${url.value} → ${response.status} (${elapsed} ms)`);
+        history.splice(8);
+        document.querySelector('#history').innerHTML = history.map(item=>`<li>${escapeHtml(item)}</li>`).join('');
+      } catch (error) { result.textContent = `Bağlantı kurulamadı. Sunucu çalışıyor mu?\n${error.message}`; }
+    });
+    function escapeHtml(value){return value.replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
+    const authResult = document.querySelector('#authResult');
+    async function authRequest(path, options={}) {
+      try {
+        const response = await fetch(path, options), text = await response.text();
+        let shown = text; try { shown = JSON.stringify(JSON.parse(text), null, 2); } catch {}
+        authResult.textContent = `${response.status} ${response.statusText}\n${shown}`;
+        return {response, text};
+      } catch (error) { authResult.textContent = `İstek başarısız: ${error.message}`; return null; }
+    }
+    document.querySelector('#login').addEventListener('click', async () => {
+      const result = await authRequest('/api/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:document.querySelector('#username').value,password:document.querySelector('#password').value})});
+      if (result && result.response.ok) { accessToken = JSON.parse(result.text).accessToken; authResult.textContent += '\n\nBearer token (sayfa belleğinde): ' + accessToken; }
+    });
+    document.querySelector('#cookieProfile').addEventListener('click', () => authRequest('/api/profile'));
+    document.querySelector('#bearerProfile').addEventListener('click', () => accessToken ? authRequest('/api/profile', {headers:{Authorization:`Bearer ${accessToken}`}}) : (authResult.textContent='Önce giriş yapıp token al.'));
+    document.querySelector('#admin').addEventListener('click', () => authRequest('/api/admin'));
+    document.querySelector('#logout').addEventListener('click', async () => { await authRequest('/api/logout', {method:'POST'}); accessToken=null; });
+  </script>
+</body>
+</html>

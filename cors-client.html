@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CORS Deney Alanı</title>
+  <style>
+    *{box-sizing:border-box}body{max-width:780px;margin:36px auto;padding:0 20px;background:#f5f7f4;color:#1b3038;font:16px/1.6 system-ui,sans-serif}main{background:white;border:1px solid #dce6e1;border-radius:14px;padding:24px}h1{margin-top:0}button,a{display:inline-block;margin:5px 6px 5px 0;padding:10px 14px;border:0;border-radius:8px;background:#17765d;color:white;text-decoration:none;font:inherit;cursor:pointer}pre{padding:16px;border-radius:9px;background:#172d36;color:#e4f2ec;white-space:pre-wrap;word-break:break-word;min-height:100px}.note{padding:12px;background:#eaf4ef;border-radius:8px}
+  </style>
+</head>
+<body><main>
+  <h1>CORS Deney Alanı</h1>
+  <p>Bu sayfa <code>localhost</code> üzerindeki ikinci porttan açılır. API ise başka portta çalışır. Portlar farklı olduğu için tarayıcı bunu farklı bir <b>origin</b> sayar.</p>
+  <p class="note">Önce ana sunucuyu başlat, sonra ikinci terminalde README’deki “CORS sayfasını aç” komutunu çalıştır. İzinli denemede özel <code>X-Demo-Header</code> başlığı gönderilir; tarayıcı önce otomatik olarak <code>OPTIONS</code> preflight isteği yapar.</p>
+  <button id="allowed">İzin verilen CORS isteği</button><button id="denied">CORS izni olmayan isteği dene</button>
+  <pre id="output">Sonuç burada görünecek.</pre>
+  <p><a id="back" href="/">Ana HTTP laboratuvarına dön</a></p>
+  <script>
+    const secure = location.protocol === 'https:';
+    const apiPort = secure ? '8443' : '8000';
+    const api = `${location.protocol}//localhost:${apiPort}`;
+    const output = document.querySelector('#output');
+    document.querySelector('#back').href = `${location.protocol}//localhost:${apiPort}/`;
+    async function run(path) {
+      output.textContent = 'İstek gönderiliyor…';
+      try {
+        const response = await fetch(`${api}${path}`, {headers: path.includes('cors-demo') ? {'X-Demo-Header':'hello-from-cors-client'} : {}});
+        output.textContent = `Tarayıcı yanıtı: ${response.status} ${response.statusText}\n\n${await response.text()}`;
+      } catch (error) {
+        output.textContent = `Tarayıcı yanıtı JavaScript’e vermedi. Bu CORS engelinin beklenen sonucudur.\n\n${error.message}\n\nGeliştirici Araçları > Network bölümünde sunucunun isteğe yanıt verip vermediğine bak.`;
+      }
+    }
+    document.querySelector('#allowed').addEventListener('click', () => run('/api/cors-demo'));
+    document.querySelector('#denied').addEventListener('click', () => run('/api/cors-denied'));
+  </script>
+</main></body>
+</html>
